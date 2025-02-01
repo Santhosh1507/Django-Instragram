@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-bi%n%+tg3s)fyn5$#1=7f559*n=4v8b=togkeo6c9rgaj%(=x@"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1","django-instragram.onrender.com"]
 
