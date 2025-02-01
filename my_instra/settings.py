@@ -25,11 +25,11 @@ SECRET_KEY = "django-insecure-bi%n%+tg3s)fyn5$#1=7f559*n=4v8b=togkeo6c9rgaj%(=x@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["127.0.0.1","django-instragram.onrender.com"]
 
-CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS = ['https://django-instragram.onrender.com']
 
-LOGIN_URL = '/login/'
+LOGIN_URL = '/loginn/'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
