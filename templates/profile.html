@@ -106,4 +106,37 @@
     }
 </style>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function openCreatePostModal() {
+          const modal = document.getElementById("exampleModal1");
+          if (modal) {
+            modal.classList.remove("hidden");
+          } else {
+            console.error("Modal with id 'exampleModal1' not found!");
+          }
+        }
+      
+        function closeCreatePostModal() {
+          const modal = document.getElementById("exampleModal1");
+          if (modal) {
+            modal.classList.add("hidden");
+          } else {
+            console.error("Modal with id 'exampleModal1' not found!");
+          }
+        }
+      
+        // Attach event listeners to buttons (if needed)
+        const openModalButton = document.getElementById("openEditProfileModalbutton");
+        if (openModalButton) {
+          openModalButton.addEventListener("click", openCreatePostModal);
+        }
+      
+        const closeModalButton = document.getElementById("EditProfileModalbutton");
+        if (closeModalButton) {
+          closeModalButton.addEventListener("click", closeCreatePostModal);
+        }
+      });
+</script>
+
 {% endblock %}
