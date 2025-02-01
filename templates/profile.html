@@ -1,0 +1,97 @@
+
+{% extends 'base.html' %}
+{% block title %} {{ user_profile.user }} {% endblock %}
+{% block content %}
+
+
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8">
+            {% include "search.html" %}
+            {% include "profile_upload.html" %}
+            {% include "edit_profile.html" %}
+
+            <!-- Profile Section -->
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <!-- Profile Header -->
+                    <div class="bg-black h-48 relative">
+                        <div class="absolute bottom-0 left-0 ml-6 mb-6 flex items-end">
+                            <img src="{{ user_profile.profileimg.url }}" alt="Profile Picture"
+                                class="w-32 h-32 rounded-full border-4 border-white">
+                            <div class="ml-4 text-white">
+                                <h2 class="text-2xl font-semibold">@{{ user_profile.user }}</h2>
+                                <p class="text-sm"><i class="fa-solid fa-location-dot"></i> {{ user_profile.location }}</p>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-0 right-0 mr-6 mb-6">
+                            {% if user == user_profile.user %}
+                            <button id="openEditProfileModalbutton"
+                                class="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-100">
+                                Edit Profile
+                            </button>
+                            {% else %}
+                            <form action="/follower" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" value="{{ user.username }}" name="follower">
+                                <input type="hidden" value="{{ user_profile.user.username }}" name="user">
+                                <button type="submit"
+                                    class="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-100">
+                                    {{ follow_unfollow }}
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Profile Stats -->
+                    <div class="p-6 bg-gray-50">
+                        <div class="flex justify-around text-center">
+                            <div>
+                                <p class="text-lg font-semibold">{{ user_post_length }}</p>
+                                <p class="text-sm text-gray-500">Photos</p>
+                            </div>
+                            <div>
+                                <p class="text-lg font-semibold">{{ user_followers }}</p>
+                                <p class="text-sm text-gray-500">Followers</p>
+                            </div>
+                            <div>
+                                <p class="text-lg font-semibold">{{ user_following }}</p>
+                                <p class="text-sm text-gray-500">Following</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- About Section -->
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-4">About</h3>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-gray-700">{{ user_profile.bio }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Photos Section -->
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-4">Photos</h3>
+                        <div class="image-grid">
+                            {% for pos in user_posts %}
+                            <div class="image-item bg-white rounded-lg shadow-sm">
+                                <img src="{{ pos.image.url }}" alt="Post Image" class="rounded-t-lg ">
+                                <div class="p-4">
+                                    <h5 class="text-lg font-semibold">{{ pos.caption }}</h5>
+                                    {% if user == user_profile.user %}
+                                    <a href="/delete/{{ pos.id }}" class="text-red-500 hover:text-red-700">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+
+{% endblock %}

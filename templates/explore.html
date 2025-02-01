@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %} Explore {% endblock %}
+{% block content %}
+
+<main class="flex-1 p-6">
+  {% include "modal.html" %}
+  {% include "search.html" %}
+
+
+  <!-- Adjust container and grid layout -->
+  <div class="container ml-auto grid grid-cols-5 gap-4 mt-2 ">
+      {% for pos in post %}
+      <div class="relative overflow-hidden rounded-2xl w-full h-48 group">
+          <!-- Use object-cover to ensure the image covers the div fully without distortion -->
+          <img class="absolute inset-0 w-full h-full object-cover" src="{{pos.image.url}}" alt="Post Image">
+          <!-- Hide the overlay initially, show on hover -->
+          <div class="absolute inset-0 bg-gray-200 bg-opacity-0 group-hover:bg-opacity-60 flex items-center justify-center transition-opacity duration-300">
+              <div class="text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <a href="/profile/{{pos.user}}" class="text-black font-bold">@{{pos.user}}</a>
+                  <p class="text-sm mt-1">{{pos.caption}}</p>
+              </div>
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+</main>
+
+{% endblock %}
