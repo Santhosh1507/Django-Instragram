@@ -192,34 +192,22 @@
           {% endfor %}
         </ul>
       </aside>
-    {% comment %} <script>
-      function postComment(postId) {
-        let commentText = document.getElementById(`comment-text-${postId}`).value;
-        let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    <script>
+      function toggleCommentSection(postId) {
+        const commentSection = document.getElementById(`openCommentSection-${postId}`);
+        const toggleButton = document.getElementById(`toggleCommentBtn-${postId}`);
       
-        fetch(`/comment-post/${postId}/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRFToken': csrfToken,
-          },
-          body: `comment_text=${commentText}`
-        })
-        .then(response => response.text())
-        .then(data => {
-          if (data) {
-            // Update the comment section with the new comment HTML
-            document.getElementById(`comment-section-${postId}`).innerHTML = data;
-          } else {
-            alert('There was an error posting the comment.');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
+        // Toggle visibility
+        if (commentSection.classList.contains('hidden')) {
+          commentSection.classList.remove('hidden');
+          toggleButton.innerHTML = '<i class="fa-solid fa-comment mr-2"></i> Hide Comments'; // Change button text
+        } else {
+          commentSection.classList.add('hidden');
+          toggleButton.innerHTML = '<i class="fa-solid fa-comment mr-2"></i> Comment'; // Reset button text
+        }
       }
       
-    </script> {% endcomment %}
+    </script>
 
   {% endblock %}
 
