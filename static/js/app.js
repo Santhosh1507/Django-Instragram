@@ -110,3 +110,30 @@ function toggleCommentSection(postId) {
 
 
 
+  function checkNotifications() {
+      fetch('/check-notifications')
+          .then(response => response.json())
+          .then(data => {
+              const dot = document.getElementById('notification-dot');
+              if (data.unread_count > 0) {
+                  dot.classList.remove('hidden'); // Show red dot
+                  playNotificationSound();
+              } else {
+                  dot.classList.add('hidden'); // Hide red dot
+              }
+          });
+  }
+
+  function playNotificationSound() {
+      const audio = new Audio("{% static 'sounds/notification.mp3' %}");
+      audio.play();
+  }
+
+  function clearNotificationDot() {
+      document.getElementById('notification-dot').classList.add('hidden');
+  }
+
+  // Check notifications every 10 seconds
+  setInterval(checkNotifications, 10000);
+  checkNotifications();
+

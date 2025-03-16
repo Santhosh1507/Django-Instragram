@@ -19,5 +19,7 @@ urlpatterns = [
     path('follow', views.follow, name='follow'),
     path('comment-post/<str:post_id>', views.comment_post, name='comment_post'),
     path('follower', views.follower, name='follow'),
+    path('notifications', views.notifications, name='notifications'),
+    path("check-notifications/", views.check_notifications, name="check_notifications"),
     
 ]

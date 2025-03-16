@@ -1,13 +1,11 @@
 from itertools import chain
 from  django . shortcuts  import  get_object_or_404, render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from . models import  Followers, LikePost, Post, Profile, Comment
+from . models import  Followers, LikePost, Post, Profile, Comment, Notification
 from django.db.models import Q
-
-
 
 
 
@@ -17,7 +15,6 @@ def signup(request):
         fnm=request.POST.get('fnm')
         emailid=request.POST.get('emailid')
         pwd=request.POST.get('pwd')
-        print(fnm,emailid,pwd)
         my_user=User.objects.create_user(fnm,emailid,pwd)
         my_user.save()
         user_model = User.objects.get(username=fnm)
@@ -37,24 +34,15 @@ def signup(request):
  return render(request, 'signup.html')
         
      
-        
-        
-        
-        
-    
-
-def loginn(request):
- 
+def loginn(request): 
   if request.method == 'POST':
         fnm=request.POST.get('fnm')
         pwd=request.POST.get('pwd')
-        print(fnm,pwd)
         userr=authenticate(request,username=fnm,password=pwd)
         if userr is not None:
             login(request,userr)
             return redirect('/')
-        
- 
+    
         invalid="Invalid Credentials"
         return render(request, 'loginn.html',{'invalid':invalid})
                
@@ -166,6 +154,13 @@ def likes(request, id):
         if like_filter is None:
             new_like = LikePost.objects.create(post_id=post, username=user, liked=True)
             post.no_of_likes = post.no_of_likes + 1
+            if user != post.user:
+                Notification.objects.create(
+                    receiver=post.user,  # Use receiver instead of user
+                    sender=user,
+                    notification_type='like',
+                    post=post
+                )
             
         else:
             like_filter.delete()
@@ -192,7 +187,6 @@ def explore(request):
 @login_required(login_url='/loginn')
 def profile(request,id_user):
     user_object = User.objects.get(username=id_user)
-    print(user_object)
     
     profile = Profile.objects.get(user=request.user)
     
@@ -304,6 +298,7 @@ def follow(request):
         else:
             # Follow logic: create a new follower relationship
             Followers.objects.create(follower=follower, user=user)
+            Notification.objects.create(receiver=user, sender=follower, notification_type='follow')
             return redirect(f'/profile/{user.username}')
     else:
         return redirect('/')
@@ -319,6 +314,13 @@ def comment_post(request, post_id):
         comment_text = request.POST.get('comment_text')  # Use the correct key 'comment_text'
         if comment_text:
             Comment.objects.create(user=user, post=post, profile=profile, comment_text=comment_text)
+            if user != post.user:
+                Notification.objects.create(
+                    receiver=post.user,  # Use `receiver` instead of `user`
+                    sender=user,
+                    notification_type='comment',
+                    post=post
+                )
         return redirect('/')  # Redirect back to the home page after posting
     else:
         return redirect('/')
@@ -342,3 +344,28 @@ def follower(request):
             return redirect('/')
     else:
         return redirect('/')
+
+
+@login_required(login_url='/loginn')
+def notifications(request):
+    profile = Profile.objects.get(user=request.user)
+    
+    # Use `receiver` instead of `user` to filter notifications
+    notifications = Notification.objects.filter(receiver=request.user).order_by('-created_at')
+
+    print(notifications)
+    
+    # Mark notifications as read
+    notifications.update(is_read=True)
+
+    return render(request, 'notifications.html', {
+        'notifications': notifications,
+        'profile': profile
+    })
+
+
+@login_required(login_url='/loginn')
+def check_notifications(request):
+    """API to check if there are unread notifications (for the red dot and sound)"""
+    unread_count = Notification.objects.filter(receiver=request.user, is_read=False).count()
+    return JsonResponse({'unread_count': unread_count})

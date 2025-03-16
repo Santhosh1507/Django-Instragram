@@ -92,6 +92,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="/notifications" class="relative flex items-center p-3 hover:bg-gray-200 rounded-lg">
+                                <i class="fa-solid fa-bell mr-2"></i> notification
+                                <span id="notification-dot" class="hidden absolute top-5 right-5 w-2 h-2 bg-green-500 rounded-full"></span>
+                            </a>
+                        </li>
+                        <li>
                             <a href="/profile/{{ user }}" class="flex items-center p-3 hover:bg-gray-200 rounded-lg">
                                 <i class="fa-solid fa-user mr-2"></i> Profile
                             </a>
@@ -115,5 +121,35 @@
   </main>
 
 </body>
+
+<script>
+    let userInteracted = false;
+    function checkNotifications() {
+        fetch('/check-notifications')
+            .then(response => response.json())
+            .then(data => {
+                const dot = document.getElementById('notification-dot');
+                if (data.unread_count > 0) {
+                    dot.classList.remove('hidden');
+                    userInteracted = true; // Show red dot
+                } else {
+                    dot.classList.add('hidden'); // Hide red dot
+                }
+            })
+            .catch(error => console.error("Error fetching notifications:", error));
+    }
+
+   
+  
+    function clearNotificationDot() {
+        document.getElementById('notification-dot').classList.add('hidden');
+    }
+  
+    // Check notifications every 10 seconds
+    setInterval(checkNotifications, 10000);
+    checkNotifications();
+</script>
+
+
 
 </html>
