@@ -16,17 +16,39 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
+
+    def save(self, *args, **kwargs):
+        """ Update sender profile image in notifications and posts when profile image changes """
+        super().save(*args, **kwargs)
+
+        profile_img_url = self.profileimg.url if self.profileimg else '/static/default_profile.png'
+
+        # Update all notifications where this user is the sender
+        Notification.objects.filter(sender=self.user).update(sender_profile_image=profile_img_url)
+
+        # Update all posts where this user is the author
+        Post.objects.filter(user=self.user).update(sender_profile_image=profile_img_url)
+
+
 # Post Model
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='post_images')
     caption = models.TextField()
+    sender_profile_image = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(default=datetime.now)
     no_of_likes = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username
+
+    def save(self, *args, **kwargs):
+        """ Automatically set sender's profile image when a post is created or updated. """
+        profile = Profile.objects.filter(user=self.user).first()
+        if profile and profile.profileimg:
+            self.sender_profile_image = profile.profileimg.url
+        super().save(*args, **kwargs)
 
 # LikePost Model
 class LikePost(models.Model):
@@ -69,6 +91,8 @@ class Notification(models.Model):
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_notifications")
     notification_type = models.CharField(max_length=10, choices=NOTIFICATION_TYPES)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
+    comment_text = models.TextField(null=True, blank=True)
+    sender_profile_image = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(default=datetime.now)
     is_read = models.BooleanField(default=False)
 

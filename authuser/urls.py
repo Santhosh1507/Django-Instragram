@@ -21,5 +21,6 @@ urlpatterns = [
     path('follower', views.follower, name='follow'),
     path('notifications', views.notifications, name='notifications'),
     path("check-notifications/", views.check_notifications, name="check_notifications"),
+    path('post/<uuid:post_id>/', views.post_detail, name='post_detail'),
     
 ]

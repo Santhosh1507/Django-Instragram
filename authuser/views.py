@@ -155,11 +155,13 @@ def likes(request, id):
             new_like = LikePost.objects.create(post_id=post, username=user, liked=True)
             post.no_of_likes = post.no_of_likes + 1
             if user != post.user:
+                sender_profile = Profile.objects.get(user=user)
                 Notification.objects.create(
                     receiver=post.user,  # Use receiver instead of user
                     sender=user,
                     notification_type='like',
-                    post=post
+                    post=post, 
+                    sender_profile_image=sender_profile.profileimg.url,
                 )
             
         else:
@@ -290,6 +292,7 @@ def follow(request):
         user = User.objects.get(username=request.POST['user'])  # Get the user to be followed
         print(user)
         print(follower)
+        sender_profile = Profile.objects.get(user=follower)
 
         if Followers.objects.filter(follower=follower, user=user).exists():
             # Unfollow logic: delete the existing follower relationship
@@ -298,7 +301,7 @@ def follow(request):
         else:
             # Follow logic: create a new follower relationship
             Followers.objects.create(follower=follower, user=user)
-            Notification.objects.create(receiver=user, sender=follower, notification_type='follow')
+            Notification.objects.create(receiver=user, sender=follower, notification_type='follow', sender_profile_image=sender_profile.profileimg.url)
             return redirect(f'/profile/{user.username}')
     else:
         return redirect('/')
@@ -315,11 +318,14 @@ def comment_post(request, post_id):
         if comment_text:
             Comment.objects.create(user=user, post=post, profile=profile, comment_text=comment_text)
             if user != post.user:
+                sender_profile = Profile.objects.get(user=user)
                 Notification.objects.create(
                     receiver=post.user,  # Use `receiver` instead of `user`
                     sender=user,
                     notification_type='comment',
-                    post=post
+                    post=post,
+                    comment_text=comment_text,
+                    sender_profile_image=sender_profile.profileimg.url
                 )
         return redirect('/')  # Redirect back to the home page after posting
     else:
@@ -333,6 +339,7 @@ def follower(request):
         user = User.objects.get(username=request.POST['user'])  # Get the user to be followed
         print(user)
         print(follower)
+        sender_profile = Profile.objects.get(user=follower)
 
         if Followers.objects.filter(follower=follower, user=user).exists():
             # Unfollow logic: delete the existing follower relationship
@@ -341,6 +348,7 @@ def follower(request):
         else:
             # Follow logic: create a new follower relationship
             Followers.objects.create(follower=follower, user=user)
+            Notification.objects.create(receiver=user, sender=follower, notification_type='follow', sender_profile_image=sender_profile.profileimg.url)
             return redirect('/')
     else:
         return redirect('/')
@@ -354,6 +362,7 @@ def notifications(request):
     notifications = Notification.objects.filter(receiver=request.user).order_by('-created_at')
 
     print(notifications)
+    
     
     # Mark notifications as read
     notifications.update(is_read=True)
@@ -369,3 +378,14 @@ def check_notifications(request):
     """API to check if there are unread notifications (for the red dot and sound)"""
     unread_count = Notification.objects.filter(receiver=request.user, is_read=False).count()
     return JsonResponse({'unread_count': unread_count})
+
+
+
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    comments = Comment.objects.filter(post=post).order_by('-created_at')
+
+    return render(request, 'post_detail.html', {
+        'post': post,
+        'comments': comments
+    })

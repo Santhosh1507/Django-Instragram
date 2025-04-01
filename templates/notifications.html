@@ -18,15 +18,20 @@
         <li class="p-4 flex items-center space-x-4">
             {% if notification.notification_type == 'follow' %}
                 <i class="fa-solid fa-user-plus text-blue-500"></i>
-                <span><strong>{{ notification.sender.username }}</strong> started following you.</span>
+                <img src="{{ notification.sender_profile_image }}" alt="Sender Profile" class="w-10 h-10 rounded-full border">
+                <span><a href="/profile/{{ notification.sender.username }}" class="hover:text-blue-500"><strong>@{{ notification.sender.username }}</strong></a> started following you.</span>
             {% elif notification.notification_type == 'like' %}
                 <i class="fa-solid fa-heart text-red-500"></i>
-                <span><strong>{{ notification.sender.username }}</strong> liked your post.</span>
+                <img src="{{ notification.sender_profile_image }}" alt="Sender Profile" class="w-10 h-10 rounded-full border">
+                <span><a href="/profile/{{ notification.sender.username }}" class="hover:text-blue-500"><strong>@{{ notification.sender.username }}</strong></a> liked your post.</span>
             {% elif notification.notification_type == 'comment' %}
                 <i class="fa-solid fa-comment text-green-500"></i>
-                <span><strong>{{ notification.sender.username }}</strong> commented on your post.</span>
+                <img src="{{ notification.sender_profile_image }}" alt="Sender Profile" class="w-10 h-10 rounded-full border">
+                <span><a href="/profile/{{ notification.sender.username }}" class="hover:text-blue-500"><strong>@{{ notification.sender.username }}</strong></a> commented on your post:</span>
+                <p class="text-gray-700 italic">"{{ notification.comment_text }}"</p>  <!-- ✅ Show comment text -->
             {% endif %}
             <small class="text-gray-500">{{ notification.created_at|date:"M d, Y - H:i" }}</small>
+            
         </li>
         {% endfor %}
     </ul>

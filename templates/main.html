@@ -19,16 +19,40 @@
               
             />
             <div class="p-6">
-              <h5 class="text-lg font-semibold">
-                <a
-                  href="/profile/{{ pos.user }}"
-                  class="hover:text-blue-500"
-                >
-                  @{{ pos.user }}
-                </a>
-              </h5>
-              <p class="mt-2 text-gray-700">{{ pos.caption }}</p>
-              <p class="text-sm text-gray-500 mt-2">{{ pos.created_at }}</p>
+              <div class="flex">
+                <div>
+                  <h5 class="text-lg font-semibold flex items-center">
+                    <img src="{{ pos.sender_profile_image }}" alt="Profile Image" class="w-10 h-10 rounded-full border">
+                    <a
+                      href="/profile/{{ pos.user }}"
+                      class="hover:text-blue-500"
+                    >
+                      @{{ pos.user }}
+                    </a>
+                  </h5>
+                  <p class="mt-2 text-gray-700">Message: {{ pos.caption }}</p>
+                  <p class="text-sm text-gray-500 mt-2">{{ pos.created_at }}</p>
+                </div>
+                <div class=" ">
+    
+                  {% if user == pos.user %}
+                    <button id="openEditProfileModalbutton"
+                    class="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-100">
+                    Edit Profile
+                    </button>
+                  {% else %}
+                    <form action="/follow" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" value="{{ user.username }}" name="follower">
+                        <input type="hidden" value="{{ user_profile.user.username }}" name="user">
+                        <button type="submit"
+                            class="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-100">
+                            {{ follow_unfollow }}
+                        </button>
+                    </form>
+                  {% endif %}
+                </div>
+                </div>
               <hr class="my-4" />
               <div class="flex justify-between items-center">
                 <a
@@ -84,7 +108,7 @@
                                       {% endif %}
                                   {% endfor %}
                                   <div>
-                                      <strong>{{ comment.user.username }}:</strong>
+                                      <a href="/profile/{{ comment.user.username }}"><strong>@{{ comment.user.username }}:</strong></a>
                                       <p class="text-gray-700">{{ comment.comment_text }}</p>
                                       <p class="text-sm text-gray-500">{{ comment.created_at }}</p>
                                   </div>
